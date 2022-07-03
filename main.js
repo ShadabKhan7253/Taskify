@@ -62,6 +62,19 @@ function removeTask(e) {
     removeFromLocalStorage(taskValue);
   }
 }
+function showFilteredTasks(e) {
+  const key = filterTask.value.toLowerCase();
+  const lis = document.querySelectorAll('.collection-item');
+  lis.forEach(function (li) {
+    let liText = li.textContent;
+    let index = liText.toLowerCase().substring(0, liText.lastIndexOf('delete')).indexOf(key);
+    if (index < 0) {
+      li.style.display = 'none';
+    } else {
+      li.style.display = 'block';
+    }
+  });
+}
 function isDeletedButton(el) {
   if (el.classList.contains('delete-task') || el.parentElement.classList.contains('delete-task')) {
     return true;
