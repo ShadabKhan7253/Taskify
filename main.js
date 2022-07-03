@@ -11,6 +11,7 @@ loadEvents();
 function loadEvents() {
   document.addEventListener('DOMContentLoaded', onload);
   form.addEventListener('submit', addTask);
+  clearALlBtn.addEventListener('click', clearALlTasks);
 }
 function onload(e) {
   var elems = document.querySelector('#emptyInputModal');
@@ -63,4 +64,11 @@ function addToLocalStorage(task) {
   }
   tasks.push(task);
   localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+function clearALlTasks(e) {
+  e.preventDefault();
+  let tasks = [];
+  while (taskList.firstChild) {
+    taskList.removeChild(taskList.firstChild);
+  }
 }
