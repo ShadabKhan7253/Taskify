@@ -12,7 +12,10 @@ function loadEvents() {
   document.addEventListener('DOMContentLoaded', onload);
   form.addEventListener('submit', addTask);
   clearALlBtn.addEventListener('click', clearALlTasks);
+  taskList.addEventListener('click', removeTask);
+  filterTask.addEventListener('keyup', showFilteredTasks);
 }
+// where ever is e i,e event function
 function onload(e) {
   var elems = document.querySelector('#emptyInputModal');
   emptyInputModalInstance = M.Modal.init(elems);
@@ -31,6 +34,39 @@ function addTask(e) {
   addToLocalStorage(input);
   // make input blank
   taskInput.value = '';
+}
+function clearALlTasks(e) {
+  e.preventDefault();
+  let tasks = [];
+  // slower method of removing  all child objects
+  // taskList.innerHTML = '';  // for computation browser take more time
+  // faster method of removing  all child objects
+  while (taskList.firstChild) {
+    taskList.removeChild(taskList.firstChild);
+  }
+}
+function removeTask(e) {
+  e.preventDefault();
+  if (isDeletedButton(e.target)) {
+    let taskValue = '';
+    if (e.target.parentElement.nodeName === 'LI') {
+      taskValue = e.target.parentElement.textContent;
+      taskValue = taskValue.substring(0, taskValue.indexOf('delete'));
+      // console.log(taskValue);
+      e.target.parentElement.remove();
+    } else {
+      taskValue = e.target.parentElement.parentElement.textContent;
+      taskValue = taskValue.substring(0, taskValue.indexOf('delete'));
+      e.target.parentElement.parentElement.remove();
+    }
+    removeFromLocalStorage(taskValue);
+  }
+}
+function isDeletedButton(el) {
+  if (el.classList.contains('delete-task') || el.parentElement.classList.contains('delete-task')) {
+    return true;
+  }
+  return false;
 }
 function loadItemsFormStorage() {
   const tasks = JSON.parse(localStorage.getItem('tasks'));
@@ -65,10 +101,16 @@ function addToLocalStorage(task) {
   tasks.push(task);
   localStorage.setItem('tasks', JSON.stringify(tasks));
 }
-function clearALlTasks(e) {
-  e.preventDefault();
+function removeFromLocalStorage(taskToBeDeleted) {
   let tasks = [];
-  while (taskList.firstChild) {
-    taskList.removeChild(taskList.firstChild);
+  let storageTasks = localStorage.getItem('tasks');
+  if (storageTasks === null) {
+    alert('there is some sync issue with localStorage! please connect with admin');
+  } else {
+    tasks = JSON.parse(storageTasks);
+    tasks = tasks.filter(function (task) {
+      return task === taskToBeDeleted ? false : true;
+    });
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 }
