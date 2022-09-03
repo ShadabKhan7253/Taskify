@@ -2,11 +2,13 @@
 // 2. on pressing delete button,we need to remove the task.
 // 3. we need to store and load all the tasks from application storage
 let emptyInputModalInstance;
+let deleteModalInstance;
 const form = document.querySelector('#task-form');
 const taskList = document.querySelector('#taskList');
 const clearALlBtn = document.querySelector('#clearAll');
 const taskInput = document.querySelector('#task');
 const filterTask = document.querySelector('#filterTask');
+const confirmValue = document.querySelector('#confirmValue');
 loadEvents();
 function loadEvents() {
   document.addEventListener('DOMContentLoaded', onload);
@@ -14,11 +16,16 @@ function loadEvents() {
   clearALlBtn.addEventListener('click', clearALlTasks);
   taskList.addEventListener('click', removeTask);
   filterTask.addEventListener('keyup', showFilteredTasks);
+  confirmValue.addEventListener('click', confirmModal);
 }
+let deletedList;
+let deletedTask;
 // where ever is e i,e event function
 function onload(e) {
   var elems = document.querySelector('#emptyInputModal');
+  var del = document.querySelector('#deleteModal');
   emptyInputModalInstance = M.Modal.init(elems);
+  deleteModalInstance = M.Modal.init(del);
   loadItemsFormStorage();
 }
 function addTask(e) {
@@ -45,21 +52,32 @@ function clearALlTasks(e) {
     taskList.removeChild(taskList.firstChild);
   }
 }
+
+function confirmModal(e) {
+  deletedList.remove();
+  removeFromLocalStorage(deletedTask);
+  // console.log(deletedTask);
+  deletedList = null;
+  deletedTask = null;
+  // modalPara.removeChild(p);
+}
+
 function removeTask(e) {
-  e.preventDefault();
   if (isDeletedButton(e.target)) {
-    let taskValue = '';
+    deleteModalInstance.open();
     if (e.target.parentElement.nodeName === 'LI') {
       taskValue = e.target.parentElement.textContent;
       taskValue = taskValue.substring(0, taskValue.indexOf('delete'));
-      // console.log(taskValue);
-      e.target.parentElement.remove();
+      deletedList = e.target.parentElement;
+      deletedTask = taskValue;
+      deleteValue.textContent = deletedTask + '?';
     } else {
       taskValue = e.target.parentElement.parentElement.textContent;
       taskValue = taskValue.substring(0, taskValue.indexOf('delete'));
-      e.target.parentElement.parentElement.remove();
+      deletedList = e.target.parentElement.parentElement;
+      deletedTask = taskValue;
+      deleteValue.textContent = deletedTask + '?';
     }
-    removeFromLocalStorage(taskValue);
   }
 }
 function showFilteredTasks(e) {
