@@ -60,7 +60,12 @@ function clearALlTasks(e) {
   // taskList.innerHTML = '';  // for computation browser take more time
   // faster method of removing  all child objects
   while (taskList.firstChild) {
-    taskList.removeChild(taskList.firstChild);
+    while (taskList.firstChild) {
+      let data = taskList.firstChild.textContent;
+      data = data.substring(0, data.indexOf('delete'));
+      taskList.removeChild(taskList.firstChild);
+      removeFromLocalStorage(data);
+    }
   }
 }
 function confirmModal(e) {
