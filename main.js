@@ -3,29 +3,40 @@
 // 3. we need to store and load all the tasks from application storage
 let emptyInputModalInstance;
 let deleteModalInstance;
+let editModalInstance;
 const form = document.querySelector('#task-form');
 const taskList = document.querySelector('#taskList');
 const clearALlBtn = document.querySelector('#clearAll');
 const taskInput = document.querySelector('#task');
 const filterTask = document.querySelector('#filterTask');
 const confirmValue = document.querySelector('#confirmValue');
+const deleteValue = document.querySelector('#deleteValue');
+const editInput = document.querySelector('#editInput');
+const saveValue = document.querySelector('#save');
 loadEvents();
 function loadEvents() {
   document.addEventListener('DOMContentLoaded', onload);
   form.addEventListener('submit', addTask);
   clearALlBtn.addEventListener('click', clearALlTasks);
   taskList.addEventListener('click', removeTask);
+  taskList.addEventListener('click', editTask);
   filterTask.addEventListener('keyup', showFilteredTasks);
   confirmValue.addEventListener('click', confirmModal);
+  saveValue.addEventListener('click', editModal);
 }
 let deletedList;
 let deletedTask;
+let taskValue = '';
+let setInputValue = '';
+let editValue = '';
 // where ever is e i,e event function
 function onload(e) {
-  var elems = document.querySelector('#emptyInputModal');
+  var empty = document.querySelector('#emptyInputModal');
   var del = document.querySelector('#deleteModal');
-  emptyInputModalInstance = M.Modal.init(elems);
+  var edit = document.querySelector('#editeModal');
+  emptyInputModalInstance = M.Modal.init(empty);
   deleteModalInstance = M.Modal.init(del);
+  editModalInstance = M.Modal.init(edit);
   loadItemsFormStorage();
 }
 function addTask(e) {
@@ -52,16 +63,48 @@ function clearALlTasks(e) {
     taskList.removeChild(taskList.firstChild);
   }
 }
-
 function confirmModal(e) {
   deletedList.remove();
   removeFromLocalStorage(deletedTask);
-  // console.log(deletedTask);
   deletedList = null;
   deletedTask = null;
-  // modalPara.removeChild(p);
 }
-
+function editModal(e) {
+  location.reload();
+  ref.textContent = editInput.value;
+  const d = localStorage.getItem('tasks');
+  const arrob = JSON.parse(d);
+  for (i = 0; i < arrob.length; i++) {
+    if (arrob[i] === editValue) {
+      arrob[i] = editInput.value;
+    }
+  }
+  localStorage.setItem('tasks', JSON.stringify(arrob));
+}
+function editTask(e) {
+  if (isEditButton(e.target)) {
+    editModalInstance.open();
+    if (e.target.parentElement.nodeName === 'LI') {
+      ref = e.target.parentElement;
+      setInputValue = e.target.parentElement.textContent;
+      setInputValue = setInputValue.substring(0, setInputValue.indexOf('delete'));
+      editInput.value = setInputValue;
+      editValue = setInputValue;
+    } else {
+      setInputValue = e.target.parentElement.parentElement.textContent;
+      ref = e.target.parentElement.parentElement;
+      setInputValue = setInputValue.substring(0, setInputValue.indexOf('delete'));
+      editInput.value = setInputValue;
+      editValue = setInputValue;
+    }
+  }
+}
+function isEditButton(el) {
+  if (el.classList.contains('edit-task') || el.parentElement.classList.contains('edit-task')) {
+    return true;
+  }
+  return false;
+}
 function removeTask(e) {
   if (isDeletedButton(e.target)) {
     deleteModalInstance.open();
@@ -119,6 +162,12 @@ function addTaskElement(task) {
   a.href = '#';
   a.innerHTML = "<i class='material-icons'>delete</i>";
   li.appendChild(a);
+  const b = document.createElement('a');
+  b.classList.add('secondary-content');
+  b.classList.add('edit-task');
+  b.href = '#';
+  b.innerHTML = "<i class='material-icons'>create</i>";
+  li.appendChild(b);
   taskList.appendChild(li);
 }
 function addToLocalStorage(task) {
